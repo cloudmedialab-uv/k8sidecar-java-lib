@@ -7,11 +7,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet middleware to process incoming HTTP requests that don't require CloudEvent processing.
+ */
 @WebServlet("/*")
 public class MiddlewareServlet extends HttpServlet {
 
-  SidecarFilter middleware;
+  private SidecarFilter middleware;
 
+  /**
+   * Constructs a new MiddlewareServlet instance.
+   *
+   * @param middleware the associated sidecar filter
+   */
   public MiddlewareServlet(SidecarFilter middleware) {
     this.middleware = middleware;
   }
