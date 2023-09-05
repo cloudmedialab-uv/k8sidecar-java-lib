@@ -5,7 +5,7 @@
 
   <groupId>sidecar.java.lib</groupId>
   <artifactId>sidecarlib</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.4</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -57,9 +57,9 @@
   </build>
   <distributionManagement>
     <repository>
-        <id>github</id>
-        <name>GitHub Packages</name>
-        <url>https://maven.pkg.github.com/k8sidecar/java-lib</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/k8sidecar/java-lib</url>
     </repository>
-</distributionManagement>
+  </distributionManagement>
 </project>
