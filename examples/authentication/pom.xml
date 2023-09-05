@@ -3,10 +3,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>sidecar.example</groupId>
-  <artifactId>logging</artifactId>
+  <artifactId>authentication</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
-  <name>logging-sidecar</name>
+  <name>authentication-sidecar</name>
   <url>http://maven.apache.org</url>
 
   <build>
