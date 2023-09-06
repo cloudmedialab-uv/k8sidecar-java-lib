@@ -1,5 +1,6 @@
 package sidecar.java.lib;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -31,46 +32,64 @@ public class FilterChain {
    * Forwards the request to the next service in the chain.
    */
   public void next() {
+    HttpURLConnection conn = null;
+
     try {
-      // Get the port from environment variable and increment by 1
+      // Obtener el puerto de la variable de entorno y sumar 1
       int port = Integer.parseInt(System.getenv("PPORT")) + 1;
 
-      System.out.println(req.getServerName() + " port: " + port + " uri: " + req.getRequestURI());
-
       URL url = new URL("http", "127.0.0.1", port, req.getRequestURI());
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod(req.getMethod());
+      conn.setConnectTimeout(5000); // 5 segundos de timeout para la conexión
+      conn.setReadTimeout(5000); // 5 segundos de timeout para lectura
 
-      // Copy headers from the original request
+      // Copiar encabezados de la solicitud original
       Enumeration<String> headerNames = req.getHeaderNames();
       while (headerNames.hasMoreElements()) {
         String headerName = headerNames.nextElement();
         conn.setRequestProperty(headerName, req.getHeader(headerName));
       }
 
-      // Copy request parameters and encode them
-      StringBuilder postData = new StringBuilder();
-      for (
-        Enumeration<String> e = req.getParameterNames();
-        e.hasMoreElements();
-      ) {
-        if (postData.length() != 0) postData.append('&');
-        String param = e.nextElement();
-        postData.append(URLEncoder.encode(param, "UTF-8"));
-        postData.append('=');
-        postData.append(URLEncoder.encode(req.getParameter(param), "UTF-8"));
-      }
-      byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+      if ("POST".equals(req.getMethod()) || "PUT".equals(req.getMethod())) {
+        // Copiar parámetros de la solicitud y codificarlos
+        StringBuilder postData = new StringBuilder();
+        Enumeration<String> paramNames = req.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+          if (postData.length() > 0) postData.append('&');
+          String param = paramNames.nextElement();
+          postData.append(URLEncoder.encode(param, "UTF-8"));
+          postData.append('=');
+          postData.append(URLEncoder.encode(req.getParameter(param), "UTF-8"));
+        }
+        byte[] postDataBytes = postData.toString().getBytes("UTF-8");
 
-      // Send the request data
-      conn.setDoOutput(true);
-      try (OutputStream os = conn.getOutputStream()) {
-        os.write(postDataBytes);
+        // Enviar datos de la solicitud
+        conn.setDoOutput(true);
+        try (OutputStream os = conn.getOutputStream()) {
+          os.write(postDataBytes);
+        }
       }
 
-      conn.connect();
+      int responseCode = conn.getResponseCode();
+      if (responseCode == HttpURLConnection.HTTP_OK) {
+        try (InputStream is = conn.getInputStream()) {
+          byte[] buffer = new byte[1024];
+          int bytesRead;
+          while ((bytesRead = is.read(buffer)) != -1) {
+            res.getOutputStream().write(buffer, 0, bytesRead);
+          }
+        }
+      } else {
+        // Manejar respuesta de error aquí, si es necesario
+        System.err.println("Error al redirigir: " + responseCode);
+      }
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      if (conn != null) {
+        conn.disconnect();
+      }
     }
   }
 
