@@ -1,6 +1,8 @@
 package sidecar.java.lib;
 
 import io.cloudevents.CloudEvent;
+import sidecar.java.lib.logging.Logback;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Server;
@@ -57,10 +59,13 @@ public class SidecarFilter {
       context.addServlet(
         new ServletHolder(new MiddlewareServletCloudEvent(this)),
         "/*"
-      );
+        );
+        
     }
-
+      
+      
     server.setHandler(context);
+    Logback.setLevel("INFO");
 
     try {
       server.start();
