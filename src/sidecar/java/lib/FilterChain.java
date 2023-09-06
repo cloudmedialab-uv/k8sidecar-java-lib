@@ -34,7 +34,10 @@ public class FilterChain {
     try {
       // Get the port from environment variable and increment by 1
       int port = Integer.parseInt(System.getenv("PPORT")) + 1;
-      URL url = new URL("http", req.getServerName(), port, req.getRequestURI());
+
+      System.out.println(req.getServerName() + " port: " + port + " uri: " + req.getRequestURI());
+
+      URL url = new URL("http", "127.0.0.1", port, req.getRequestURI());
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod(req.getMethod());
 
