@@ -8,6 +8,8 @@ import java.net.URLEncoder;
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a chain that can forward the request to a subsequent step.
@@ -16,6 +18,8 @@ public class FilterChain {
 
   private HttpServletRequest req;
   private HttpServletResponse res;
+
+  private static Logger log = LoggerFactory.getLogger(FilterChain.class);
 
   /**
    * Constructs a new FilterChain instance.
@@ -35,16 +39,20 @@ public class FilterChain {
     HttpURLConnection conn = null;
 
     try {
-      // Obtener el puerto de la variable de entorno y sumar 1
       int port = Integer.parseInt(System.getenv("PPORT")) + 1;
 
       URL url = new URL("http", "127.0.0.1", port, req.getRequestURI());
+      log.info(
+        "Making request to URL: {} with method: {}",
+        url,
+        req.getMethod()
+      );
+
       conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod(req.getMethod());
-      conn.setConnectTimeout(5000); // 5 segundos de timeout para la conexión
-      conn.setReadTimeout(5000); // 5 segundos de timeout para lectura
+      conn.setConnectTimeout(5000);
+      conn.setReadTimeout(5000);
 
-      // Copiar encabezados de la solicitud original
       Enumeration<String> headerNames = req.getHeaderNames();
       while (headerNames.hasMoreElements()) {
         String headerName = headerNames.nextElement();
@@ -52,7 +60,6 @@ public class FilterChain {
       }
 
       if ("POST".equals(req.getMethod()) || "PUT".equals(req.getMethod())) {
-        // Copiar parámetros de la solicitud y codificarlos
         StringBuilder postData = new StringBuilder();
         Enumeration<String> paramNames = req.getParameterNames();
         while (paramNames.hasMoreElements()) {
@@ -64,7 +71,6 @@ public class FilterChain {
         }
         byte[] postDataBytes = postData.toString().getBytes("UTF-8");
 
-        // Enviar datos de la solicitud
         conn.setDoOutput(true);
         try (OutputStream os = conn.getOutputStream()) {
           os.write(postDataBytes);
@@ -72,20 +78,38 @@ public class FilterChain {
       }
 
       int responseCode = conn.getResponseCode();
-      if (responseCode == HttpURLConnection.HTTP_OK) {
+      if (responseCode >= 200 && responseCode < 300) {
         try (InputStream is = conn.getInputStream()) {
           byte[] buffer = new byte[1024];
           int bytesRead;
+          StringBuilder responseBody = new StringBuilder();
           while ((bytesRead = is.read(buffer)) != -1) {
             res.getOutputStream().write(buffer, 0, bytesRead);
+            responseBody.append(new String(buffer, 0, bytesRead));
           }
+          log.info(
+            "Response Code: {}. Response Body: {}",
+            responseCode,
+            responseBody.toString().trim()
+          );
         }
       } else {
-        // Manejar respuesta de error aquí, si es necesario
-        System.err.println("Error al redirigir: " + responseCode);
+        try (InputStream es = conn.getErrorStream()) {
+          byte[] buffer = new byte[1024];
+          int bytesRead;
+          StringBuilder errorBody = new StringBuilder();
+          while ((bytesRead = es.read(buffer)) != -1) {
+            errorBody.append(new String(buffer, 0, bytesRead));
+          }
+          log.error(
+            "Failed to redirect. Response Code: {}. Error Message: {}",
+            responseCode,
+            errorBody.toString().trim()
+          );
+        }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("Exception while processing the request", e);
     } finally {
       if (conn != null) {
         conn.disconnect();
