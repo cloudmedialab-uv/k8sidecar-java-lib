@@ -39,8 +39,10 @@ public class FilterChain {
     HttpURLConnection conn = null;
 
     try {
+      // Parse the port number from environment variables and increment by one
       int port = Integer.parseInt(System.getenv("PPORT")) + 1;
 
+      // Create a new URL targeting the localhost and the calculated port
       URL url = new URL("http", "127.0.0.1", port, req.getRequestURI());
       log.info(
         "Making request to URL: {} with method: {}",
@@ -48,35 +50,43 @@ public class FilterChain {
         req.getMethod()
       );
 
+      // Open a connection to the created URL
       conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod(req.getMethod());
       conn.setConnectTimeout(5000);
       conn.setReadTimeout(5000);
 
+      // Copy all headers from the original request to the new connection
       Enumeration<String> headerNames = req.getHeaderNames();
       while (headerNames.hasMoreElements()) {
         String headerName = headerNames.nextElement();
         conn.setRequestProperty(headerName, req.getHeader(headerName));
       }
 
+      // If the request method is POST or PUT, copy the request body
       if ("POST".equals(req.getMethod()) || "PUT".equals(req.getMethod())) {
-        StringBuilder postData = new StringBuilder();
-        Enumeration<String> paramNames = req.getParameterNames();
-        while (paramNames.hasMoreElements()) {
-          if (postData.length() > 0) postData.append('&');
-          String param = paramNames.nextElement();
-          postData.append(URLEncoder.encode(param, "UTF-8"));
-          postData.append('=');
-          postData.append(URLEncoder.encode(req.getParameter(param), "UTF-8"));
-        }
-        byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-
         conn.setDoOutput(true);
-        try (OutputStream os = conn.getOutputStream()) {
-          os.write(postDataBytes);
+
+        // Directly copy the body, regardless of content type
+        try (
+          InputStream originalInput = req.getInputStream();
+          OutputStream newOutput = conn.getOutputStream()
+        ) {
+          byte[] buffer = new byte[1024];
+          int bytesRead;
+
+          while ((bytesRead = originalInput.read(buffer)) != -1) {
+            newOutput.write(buffer, 0, bytesRead);
+          }
+        } catch (Exception ex) {
+          log.error(
+            "Failed to copy the request body. Error Message: {}",
+            ex.toString().trim()
+          );
         }
       }
 
+      // Retrieve and handle the response from the connection
       int responseCode = conn.getResponseCode();
       if (responseCode >= 200 && responseCode < 300) {
         try (InputStream is = conn.getInputStream()) {
@@ -94,6 +104,7 @@ public class FilterChain {
           );
         }
       } else {
+        // Handle any errors in the response
         try (InputStream es = conn.getErrorStream()) {
           byte[] buffer = new byte[1024];
           int bytesRead;
@@ -111,6 +122,7 @@ public class FilterChain {
     } catch (Exception e) {
       log.error("Exception while processing the request", e);
     } finally {
+      // Ensure connection is closed
       if (conn != null) {
         conn.disconnect();
       }
