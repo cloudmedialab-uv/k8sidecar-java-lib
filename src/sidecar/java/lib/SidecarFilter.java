@@ -1,13 +1,20 @@
 package sidecar.java.lib;
 
 import io.cloudevents.CloudEvent;
-import sidecar.java.lib.logging.Logback;
-
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import sidecar.java.lib.logging.Logback;
 
 /**
  * SidecarFilter serves as a middleware, intercepting incoming HTTP requests
@@ -59,11 +66,9 @@ public class SidecarFilter {
       context.addServlet(
         new ServletHolder(new MiddlewareServletCloudEvent(this)),
         "/*"
-        );
-        
+      );
     }
-      
-      
+
     server.setHandler(context);
     Logback.setLevel("INFO");
 
@@ -87,8 +92,16 @@ public class SidecarFilter {
     HttpServletResponse res,
     CloudEvent cloudEvent
   ) {
-    FilterChain chain = new FilterChain(req, res);
-    quaF.apply(req, res, cloudEvent, chain);
+    try {
+      Pair<HttpServletRequestWrapper, HttpServletRequestWrapper> wrappers = getRequestWrappers(
+        req
+      );
+      // Initialize the filter chain with the copied request and the original response
+      FilterChain chain = new FilterChain(wrappers.getRight(), res);
+      quaF.apply(wrappers.getLeft(), res, cloudEvent, chain);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -98,7 +111,64 @@ public class SidecarFilter {
    * @param res the outgoing response
    */
   public void handleRequest(HttpServletRequest req, HttpServletResponse res) {
-    FilterChain chain = new FilterChain(req, res);
-    triF.apply(req, res, chain);
+    try {
+      Pair<HttpServletRequestWrapper, HttpServletRequestWrapper> wrappers = getRequestWrappers(
+        req
+      );
+      // Initialize the filter chain with the copied request and the original response
+      FilterChain chain = new FilterChain(wrappers.getRight(), res);
+      triF.apply(wrappers.getLeft(), res, chain);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Extracts the body from the given request and creates original and copied wrappers.
+   *
+   * @param req the incoming request
+   * @return a pair of HttpServletRequestWrappers: the first is the original, the second is the copied version
+   */
+  private Pair<HttpServletRequestWrapper, HttpServletRequestWrapper> getRequestWrappers(
+    HttpServletRequest req
+  ) throws IOException {
+    // Read the body of the original request
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    IOUtils.copy(req.getInputStream(), baos);
+    byte[] bodyBytes = baos.toByteArray();
+
+    // Replace the original request's body with a version that can be read again
+    HttpServletRequestWrapper originalRequestWrapper = new HttpServletRequestWrapper(
+      req
+    ) {
+      @Override
+      public ServletInputStream getInputStream() {
+        return new ServletInputStreamImpl(new ByteArrayInputStream(bodyBytes));
+      }
+
+      @Override
+      public BufferedReader getReader() {
+        return new BufferedReader(new InputStreamReader(getInputStream()));
+      }
+    };
+
+    // Create a copy of the request and replace its body with a readable version
+    HttpServletRequestWrapper copiedRequestWrapper = new HttpServletRequestWrapper(
+      originalRequestWrapper
+    ) {
+      @Override
+      public ServletInputStream getInputStream() {
+        return new ServletInputStreamImpl(
+          new ByteArrayInputStream(bodyBytes.clone())
+        );
+      }
+
+      @Override
+      public BufferedReader getReader() {
+        return new BufferedReader(new InputStreamReader(getInputStream()));
+      }
+    };
+
+    return new Pair<>(originalRequestWrapper, copiedRequestWrapper);
   }
 }
