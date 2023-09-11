@@ -5,7 +5,7 @@
 
   <groupId>sidecar.java.lib</groupId>
   <artifactId>sidecarlib</artifactId>
-  <version>0.0.8</version>
+  <version>0.0.9</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
