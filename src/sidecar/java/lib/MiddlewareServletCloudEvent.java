@@ -34,6 +34,16 @@ public class MiddlewareServletCloudEvent extends HttpServlet {
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse res)
     throws ServletException, IOException {
+    CloudEvent cloudEvent = getCloutEvent(req, res);
+
+    // Pass the request, response, and CloudEvent to the middleware for processing
+    middleware.handleRequest(req, res, cloudEvent);
+  }
+
+  private CloudEvent getCloutEvent(
+    HttpServletRequest req,
+    HttpServletResponse res
+  ) throws IOException {
     // Extract HTTP request headers into a Map
     Map<String, String> headers = new HashMap<>();
     Enumeration<String> headerNames = req.getHeaderNames();
@@ -50,9 +60,6 @@ public class MiddlewareServletCloudEvent extends HttpServlet {
       headers,
       body
     );
-    CloudEvent cloudEvent = messageReader.toEvent();
-
-    // Pass the request, response, and CloudEvent to the middleware for processing
-    middleware.handleRequest(req, res, cloudEvent);
+    return messageReader.toEvent();
   }
 }

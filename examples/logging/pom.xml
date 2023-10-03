@@ -32,7 +32,7 @@
     <dependency>
       <groupId>sidecar.java.lib</groupId>
       <artifactId>sidecarlib</artifactId>
-      <version>0.0.4</version>
+      <version>0.0.9</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

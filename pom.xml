@@ -5,7 +5,7 @@
 
   <groupId>sidecar.java.lib</groupId>
   <artifactId>sidecarlib</artifactId>
-  <version>0.0.8</version>
+  <version>0.0.10</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -18,7 +18,6 @@
       <artifactId>slf4j-api</artifactId>
       <version>2.0.0-alpha7</version>
     </dependency>
-
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -51,6 +50,13 @@
       <artifactId>cloudevents-http-basic</artifactId>
       <version>2.3.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.13.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>

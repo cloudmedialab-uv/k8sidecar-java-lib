@@ -52,8 +52,8 @@ public class FilterChain {
       // Open a connection to the created URL
       conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod(req.getMethod());
-      conn.setConnectTimeout(5000);
-      conn.setReadTimeout(5000);
+      conn.setConnectTimeout(0);
+      conn.setReadTimeout(0);
 
       // Copy all headers from the original request to the new connection
       Enumeration<String> headerNames = req.getHeaderNames();
