@@ -61,8 +61,7 @@ public class SidecarFilter {
         "/*"
         );
         
-    }
-      
+    }    
       
     server.setHandler(context);
     Logback.setLevel("INFO");
