@@ -24,10 +24,10 @@ import sidecar.java.lib.logging.Logback;
 public class SidecarFilter {
 
   // Represents a user-provided function that processes HTTP requests with CloudEvent information
-  private QuaFunction<HttpServletRequest, HttpServletResponse, CloudEvent, FilterChain, Void> quaF;
+  private QuaFunction<HttpServletRequest, HttpServletResponse, CloudEvent, FilterChain> quaF;
 
   // Represents a user-provided function that processes regular HTTP requests
-  private TriFunction<HttpServletRequest, HttpServletResponse, FilterChain, Void> triF;
+  private TriFunction<HttpServletRequest, HttpServletResponse, FilterChain> triF;
 
   /**
    * Constructor for SidecarFilter when a CloudEvent function is provided.
@@ -35,7 +35,7 @@ public class SidecarFilter {
    * @param userFunction the user-provided function for CloudEvent processing
    */
   public SidecarFilter(
-    QuaFunction<HttpServletRequest, HttpServletResponse, CloudEvent, FilterChain, Void> userFunction
+    QuaFunction<HttpServletRequest, HttpServletResponse, CloudEvent, FilterChain> userFunction
   ) {
     this.quaF = userFunction;
     this.triF = null;
@@ -47,7 +47,7 @@ public class SidecarFilter {
    * @param userFunction the user-provided function for regular HTTP processing
    */
   public SidecarFilter(
-    TriFunction<HttpServletRequest, HttpServletResponse, FilterChain, Void> userFunction
+    TriFunction<HttpServletRequest, HttpServletResponse, FilterChain> userFunction
   ) {
     this.triF = userFunction;
     this.quaF = null;
@@ -98,7 +98,7 @@ public class SidecarFilter {
       );
       // Initialize the filter chain with the copied request and the original response
       FilterChain chain = new FilterChain(wrappers.getRight(), res);
-      quaF.apply(wrappers.getLeft(), res, cloudEvent, chain);
+      quaF.accept(wrappers.getLeft(), res, cloudEvent, chain);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -117,7 +117,7 @@ public class SidecarFilter {
       );
       // Initialize the filter chain with the copied request and the original response
       FilterChain chain = new FilterChain(wrappers.getRight(), res);
-      triF.apply(wrappers.getLeft(), res, chain);
+      triF.accept(wrappers.getLeft(), res, chain);
     } catch (Exception e) {
       e.printStackTrace();
     }
