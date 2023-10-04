@@ -66,9 +66,10 @@ public class SidecarFilter {
       context.addServlet(
         new ServletHolder(new MiddlewareServletCloudEvent(this)),
         "/*"
-      );
-    }
-
+        );
+        
+    }    
+      
     server.setHandler(context);
     Logback.setLevel("INFO");
 
