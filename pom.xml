@@ -3,9 +3,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>sidecar.java.lib</groupId>
+  <groupId>k8sidecar.java.lib</groupId>
   <artifactId>sidecarlib</artifactId>
-  <version>0.0.11</version>
+  <version>1.0.0</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -76,7 +76,7 @@
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/k8sidecar/java-lib</url>
+      <url>https://maven.pkg.github.com/cloudmedialab-uv/k8sidecar-java-lib</url>
     </repository>
   </distributionManagement>
 </project>

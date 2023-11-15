@@ -1,4 +1,4 @@
-package sidecar.java.lib;
+package k8sidecar.java.lib;
 
 /**
  * A functional interface representing a function that accepts four arguments and produces a result.

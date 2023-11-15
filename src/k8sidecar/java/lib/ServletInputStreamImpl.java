@@ -1,4 +1,4 @@
-package sidecar.java.lib;
+package k8sidecar.java.lib;
 
 import java.io.ByteArrayInputStream;
 import javax.servlet.ReadListener;

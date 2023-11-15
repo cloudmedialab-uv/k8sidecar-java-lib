@@ -1,4 +1,4 @@
-package sidecar.java.lib;
+package k8sidecar.java.lib;
 
 import io.cloudevents.CloudEvent;
 import java.io.BufferedReader;
@@ -10,11 +10,11 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import k8sidecar.java.lib.logging.Logback;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import sidecar.java.lib.logging.Logback;
 
 /**
  * SidecarFilter serves as a middleware, intercepting incoming HTTP requests
@@ -66,10 +66,9 @@ public class SidecarFilter {
       context.addServlet(
         new ServletHolder(new MiddlewareServletCloudEvent(this)),
         "/*"
-        );
-        
-    }    
-      
+      );
+    }
+
     server.setHandler(context);
     Logback.setLevel("INFO");
 

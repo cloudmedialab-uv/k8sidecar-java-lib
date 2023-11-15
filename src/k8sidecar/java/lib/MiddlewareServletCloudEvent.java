@@ -1,4 +1,4 @@
-package sidecar.java.lib;
+package k8sidecar.java.lib;
 
 import io.cloudevents.CloudEvent;
 import io.cloudevents.core.message.MessageReader;
