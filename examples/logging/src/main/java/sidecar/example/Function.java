@@ -2,9 +2,9 @@ package sidecar.example;
 
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
+import k8sidecar.java.lib.SidecarFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sidecar.java.lib.SidecarFilter;
 
 // Middleware function
 public class Function {
@@ -41,7 +41,6 @@ public class Function {
       } catch (Exception e) {
         logger.error("Error processing request", e);
       }
-      return null;
     });
 
     // Server start

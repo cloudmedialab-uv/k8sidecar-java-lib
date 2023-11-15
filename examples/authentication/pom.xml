@@ -30,9 +30,9 @@
       <version>4.0.1</version>
     </dependency>
     <dependency>
-      <groupId>sidecar.java.lib</groupId>
+      <groupId>k8sidecar.java.lib</groupId>
       <artifactId>sidecarlib</artifactId>
-      <version>0.0.9</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -49,7 +49,7 @@
   <repositories>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/k8sidecar/java-lib</url>
+      <url>https://maven.pkg.github.com/cloudmedialab-uv/k8sidecar-java-lib</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>

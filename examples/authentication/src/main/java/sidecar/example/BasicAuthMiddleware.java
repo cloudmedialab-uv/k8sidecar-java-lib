@@ -3,9 +3,9 @@ package sidecar.example;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import k8sidecar.java.lib.FilterChain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sidecar.java.lib.FilterChain;
 
 public class BasicAuthMiddleware {
 
@@ -24,7 +24,7 @@ public class BasicAuthMiddleware {
    * @param chain - Chain to proceed with the request if validation passes.
    * @return Void
    */
-  public static Void authenticate(
+  public static void authenticate(
     HttpServletRequest req,
     HttpServletResponse res,
     FilterChain chain
@@ -41,7 +41,7 @@ public class BasicAuthMiddleware {
           HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
           "Internal Configuration Error"
         );
-        return null;
+        return;
       }
 
       // Fetch the client's token from the request header.
@@ -66,7 +66,5 @@ public class BasicAuthMiddleware {
         logger.error("Error sending the error response: ", ioException);
       }
     }
-
-    return null;
   }
 }

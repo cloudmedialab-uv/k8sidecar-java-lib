@@ -2,9 +2,9 @@ package sidecar.example;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import sidecar.java.lib.FilterChain;
-import sidecar.java.lib.SidecarFilter;
-import sidecar.java.lib.TriFunction;
+import k8sidecar.java.lib.FilterChain;
+import k8sidecar.java.lib.SidecarFilter;
+import k8sidecar.java.lib.TriFunction;
 
 // Middleware function
 public class Function {
@@ -15,7 +15,7 @@ public class Function {
    */
   public static void main(String[] args) {
     // Create an instance of the authentication middleware function.
-    TriFunction<HttpServletRequest, HttpServletResponse, FilterChain, Void> userFunction =
+    TriFunction<HttpServletRequest, HttpServletResponse, FilterChain> userFunction =
       BasicAuthMiddleware::authenticate;
     // Instantiate the server with the authentication function.
     SidecarFilter server = new SidecarFilter(userFunction);

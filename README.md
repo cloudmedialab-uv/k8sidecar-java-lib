@@ -12,9 +12,9 @@ To install the Sidecar library, Add this to pom.xm:
 
 ```xml
 <dependency>
-  <groupId>sidecar.java.lib</groupId>
+  <groupId>k8sidecar.java.lib</groupId>
   <artifactId>sidecarlib</artifactId>
-  <version>0.0.10</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
