@@ -42,7 +42,7 @@ public class FilterChain {
       int port = Integer.parseInt(System.getenv("PPORT")) + 1;
 
       // Create a new URL targeting the localhost and the calculated port
-      URL url = new URL("http", "127.0.0.1", port, req.getRequestURI());
+      URL url = new URL("http", "0.0.0.0", port, req.getRequestURI());
       log.info(
         "Making request to URL: {} with method: {}",
         url,
