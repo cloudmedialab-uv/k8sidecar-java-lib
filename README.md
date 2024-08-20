@@ -93,6 +93,8 @@ We provide an image of this sidecar in dockerhub `cloudmedialab/sidecar-authenti
 
 The sample code is in in [examples/authentication](examples/authentication).
 
+See [k8sidecar](https://github.com/cloudmedialab-uv/k8sidecar) for an example of usage to define a Filter using this sidecar.
+
 ## Logging
 
 This is an example of the use of a TriFunction that can be used to show information about the requests.
@@ -105,3 +107,5 @@ Information about the request is logged (in this simple example it is shown in t
 We provide an image of this sidecar in dockerhub `cloudmedialab/sidecar-logging:1.0.0`
 
 The sample code is in [examples/logging](examples/logging).
+
+See [k8sidecar](https://github.com/cloudmedialab-uv/k8sidecar) for an example of usage to define a Filter using this sidecar.
