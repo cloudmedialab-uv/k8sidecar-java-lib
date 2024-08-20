@@ -91,7 +91,7 @@ passed to the next sidecar (or application). Otherwise, this sidecar returns a 4
 
 We provide an image of this sidecar in dockerhub `cloudmedialab/sidecar-authentication:1.0.0`
 
-The sample code is in in [folder](examples/authentication).
+The sample code is in in [examples/authentication](examples/authentication).
 
 ## Logging
 
@@ -104,4 +104,4 @@ Information about the request is logged (in this simple example it is shown in t
 
 We provide an image of this sidecar in dockerhub `cloudmedialab/sidecar-logging:1.0.0`
 
-The sample code is in in [folder](examples/logging).
+The sample code is in [examples/logging](examples/logging).
