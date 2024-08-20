@@ -91,6 +91,8 @@ passed to the next sidecar (or application). Otherwise, this sidecar returns a 4
 
 We provide an image of this sidecar in dockerhub `cloudmedialab/sidecar-authentication:1.0.0`
 
+The sample code is in in [folder](examples/authentication).
+
 ## Logging
 
 This is an example of the use of a TriFunction that can be used to show information about the requests.
@@ -101,3 +103,5 @@ The level of logging performed in this sidecar can be controlled with the follow
 Information about the request is logged (in this simple example it is shown in the standard output) and then the request is passed to the next sidecar (or application).
 
 We provide an image of this sidecar in dockerhub `cloudmedialab/sidecar-logging:1.0.0`
+
+The sample code is in in [folder](examples/logging).
