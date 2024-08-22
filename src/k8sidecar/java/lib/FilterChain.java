@@ -5,6 +5,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -44,10 +47,9 @@ public class FilterChain {
       // Create a new URL targeting the localhost and the calculated port
       URL url = new URL("http", "0.0.0.0", port, req.getRequestURI());
       log.info(
-        "Making request to URL: {} with method: {}",
-        url,
-        req.getMethod()
-      );
+          "Making request to URL: {} with method: {}",
+          url,
+          req.getMethod());
 
       // Open a connection to the created URL
       conn = (HttpURLConnection) url.openConnection();
@@ -68,9 +70,8 @@ public class FilterChain {
 
         // Directly copy the body, regardless of content type
         try (
-          InputStream originalInput = req.getInputStream();
-          OutputStream newOutput = conn.getOutputStream()
-        ) {
+            InputStream originalInput = req.getInputStream();
+            OutputStream newOutput = conn.getOutputStream()) {
           byte[] buffer = new byte[1024];
           int bytesRead;
 
@@ -79,45 +80,37 @@ public class FilterChain {
           }
         } catch (Exception ex) {
           log.error(
-            "Failed to copy the request body. Error Message: {}",
-            ex.toString().trim()
-          );
+              "Failed to copy the request body. Error Message: {}",
+              ex.toString().trim());
         }
       }
 
       // Retrieve and handle the response from the connection
       int responseCode = conn.getResponseCode();
-      if (responseCode >= 200 && responseCode < 300) {
-        try (InputStream is = conn.getInputStream()) {
-          byte[] buffer = new byte[1024];
-          int bytesRead;
-          StringBuilder responseBody = new StringBuilder();
-          while ((bytesRead = is.read(buffer)) != -1) {
-            res.getOutputStream().write(buffer, 0, bytesRead);
-            responseBody.append(new String(buffer, 0, bytesRead));
+      try (InputStream is = conn.getInputStream()) {
+        
+        int bytesRead;
+        res.setStatus(responseCode);
+        for (Map.Entry<String, List<String>> entries : conn.getHeaderFields().entrySet()) {
+          if (entries.getKey() != null &&
+              !entries.getKey().contains("Transfer-Encoding")) {
+            String values = "";
+            for (String value : entries.getValue()) {
+              values += value + ",";
+            }
+            values = values.substring(0, values.length() - 1);
+            res.setHeader(entries.getKey(), values);
           }
-          log.info(
-            "Response Code: {}. Response Body: {}",
-            responseCode,
-            responseBody.toString().trim()
-          );
         }
-      } else {
-        // Handle any errors in the response
-        try (InputStream es = conn.getErrorStream()) {
-          byte[] buffer = new byte[1024];
-          int bytesRead;
-          StringBuilder errorBody = new StringBuilder();
-          while ((bytesRead = es.read(buffer)) != -1) {
-            errorBody.append(new String(buffer, 0, bytesRead));
-          }
-          log.error(
-            "Failed to redirect. Response Code: {}. Error Message: {}",
-            responseCode,
-            errorBody.toString().trim()
-          );
+
+        // TODO is.transferTo()
+        byte[] buffer = new byte[1024];
+        while ((bytesRead = is.read(buffer)) != -1) {
+          res.getOutputStream().write(buffer, 0, bytesRead);
         }
+        res.getOutputStream().flush();
       }
+
     } catch (Exception e) {
       log.error("Exception while processing the request", e);
     } finally {
