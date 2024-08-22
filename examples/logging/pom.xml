@@ -5,7 +5,7 @@
   <groupId>sidecar.example</groupId>
   <artifactId>logging</artifactId>
   <packaging>jar</packaging>
-  <version>1.0</version>
+  <version>1.0.0</version>
   <name>logging-sidecar</name>
   <url>http://maven.apache.org</url>
 
